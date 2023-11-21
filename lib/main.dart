@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:elderly_app/dbfiles/database_connector.dart';
+import 'package:sqflite/sqflite.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,6 +27,7 @@ class MenuScreen extends StatelessWidget {
     {'title': 'Emergencia', 'icon': Icons.warning},
   ];
 
+  //List? _employeeFinallist;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,6 +83,11 @@ class MenuScreen extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: DBConDisplay,
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
+      ),
     );
   }
 
@@ -111,6 +120,34 @@ class MenuScreen extends StatelessWidget {
       context,
       MaterialPageRoute(builder: (context) => screen),
     );
+  }
+
+  void DBConInsert() {
+    DatabaseConnect con = DatabaseConnect();
+
+    final Future<Database> dbFuture = con.initializeDatabase();
+    dbFuture.then((database) {
+      Future<int> noteListFutureInsert = con.insertStatic();
+      noteListFutureInsert.then((noteList) {
+        print(noteList);
+      });
+    });
+  }
+
+  void DBConDisplay() {
+    DatabaseConnect con = DatabaseConnect();
+
+    List<Map<String, dynamic>> list = [];
+    final Future<Database> dbFuture = con.initializeDatabase();
+    dbFuture.then((database) {
+      Future<List<Map<String, dynamic>>> noteListFuture = con.getList();
+      noteListFuture.then((emp_data) {
+        for (var i = 0; i < emp_data.length; i++) {
+          Map m = emp_data[i];
+          m.forEach((k, v) => print('${k}: ${v}'));
+        }
+      });
+    });
   }
 }
 
